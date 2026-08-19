@@ -1,11 +1,12 @@
 ---
-title: About
+title: About this journal
+description: A compact demo site for Pagecraft’s publishing features.
 ---
 
-# About
+# About this journal
 
-This demo site was generated with **Pagecraft**, a small static site
-generator that turns a folder of Markdown files into a fast, polished
-website.
+This small journal exists to show the full Pagecraft publishing flow in a format that feels like a real site rather than a feature checklist.
 
-No databases. No build servers. Just Markdown and a single command.
+Everything here begins as Markdown. The generator turns it into a static site with templates, archives, categories, tags, syntax highlighting, an RSS feed, and discovery files for search engines.
+
+No dashboard is required. Just a folder of writing and a build you can trust.

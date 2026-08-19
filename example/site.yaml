@@ -1,13 +1,38 @@
-title: Pagecraft Demo
-description: A demo site showing off Pagecraft's features.
+title: Pagecraft Journal
+description: A small demo journal built to show how Pagecraft handles thoughtful static publishing.
 url: https://pagecraft-demo.vercel.app
 author: Vincenzo
+language: en
 posts_dir: posts
 pages_dir: pages
 assets_dir: assets
 output_dir: _site
 permalinks: true
+pagination:
+  per_page: 2
 feed:
   enabled: true
   filename: feed.xml
   posts_limit: 20
+sitemap:
+  enabled: true
+  filename: sitemap.xml
+robots:
+  enabled: true
+  filename: robots.txt
+seo:
+  default_image: ''
+  twitter_handle: ''
+theme:
+  mode: auto
+navigation:
+  - label: Home
+    url: /
+  - label: About
+    url: /about.html
+  - label: Tags
+    url: /tags.html
+  - label: Categories
+    url: /categories.html
+  - label: Archive
+    url: /archive.html

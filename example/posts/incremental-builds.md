@@ -1,30 +1,16 @@
 ---
-title: Incremental Builds Explained
-date: 2026-08-18
-tags: [static-sites, performance]
-description: How Pagecraft rebuilds only what changed.
+title: Why incremental builds are a publishing feature
+date: 2026-08-12
+categories: [Tooling]
+tags: [performance, static-sites, pagecraft]
+description: Fast rebuilds keep the feedback loop short enough that publishing remains pleasant.
+summary: A site generator should notice what changed without making correctness optional.
 ---
 
-# Incremental Builds Explained
+# Why incremental builds are a publishing feature
 
-Nobody likes waiting for a full rebuild when a single word changed.
-Pagecraft keeps a small content-hash cache in `.pagecraft/manifest.json`
-and compares it against the current state of every file before writing
-output.
+Fast builds are not just an engineering benchmark. They change how often someone is willing to preview a draft, adjust a title, or fix a tiny link.
 
-| Scenario | What Pagecraft does |
-| --- | --- |
-| First build | Generates every post, page, index, tag page, and feed |
-| Changed one post | Rebuilds only that post, index, tag pages, and feed |
-| Unchanged post | Reuses the previously written HTML |
-| Template change | Rebuilds everything, because layouts affect all pages |
+Pagecraft renders the complete set of derived pages in memory, compares content hashes, writes only changed files, and removes stale output after a rename or deletion. That means tag pages, feeds, archives, pagination, and the sitemap stay honest without asking authors to remember a special command.
 
-A change *ripples* exactly where it needs to: editing a post regenerates
-the post, the homepage listing, any tag pages that reference it, and the
-RSS feed. Everything else stays untouched.
-
-Run builds continuously with watch mode:
-
-```bash
-pagecraft watch
-```
+The important part is not merely skipping work. It is keeping the generated site correct when the source changes.

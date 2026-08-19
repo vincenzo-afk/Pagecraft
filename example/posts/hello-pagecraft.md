@@ -1,43 +1,23 @@
 ---
-title: Hello, Pagecraft!
+title: A calmer way to publish a small site
 date: 2026-08-15
-tags: [intro, static-sites]
-description: The first post on a brand new Pagecraft site.
+updated: 2026-08-18
+categories: [Publishing]
+tags: [pagecraft, writing, static-sites]
+description: A short introduction to Pagecraft and the case for keeping a publishing workflow close to plain files.
+summary: Good publishing tools should disappear while you are writing.
 ---
 
-# Hello, Pagecraft!
+# A calmer way to publish a small site
 
-Welcome to the very first post generated with **Pagecraft**, a
-Markdown-to-HTML static site generator with layouts, tags, RSS feeds,
-syntax highlighting, asset copying, and incremental builds.
+A personal site does not need a dashboard, a database, or a long setup ritual. It needs a place for writing, a dependable build, and enough structure to make old work easy to find.
 
-## Writing posts
-
-Every post is just a Markdown file with a bit of front matter at the top:
-
-```yaml
----
-title: Hello, Pagecraft!
-date: 2026-08-15
-tags: [intro, static-sites]
-description: The first post on a brand new Pagecraft site.
----
-```
-
-And here is some highlighted code, because code fences deserve proper
-syntax highlighting:
+Pagecraft keeps those pieces close together. Posts stay in Markdown, the site configuration stays in one YAML file, and templates remain ordinary HTML.
 
 ```python
-def fibonacci(n: int) -> int:
-    """Return the n-th Fibonacci number."""
-    a, b = 0, 1
-    for _ in range(n):
-        a, b = b, a + b
-    return a
+from pagecraft.builder import Builder
 
-if __name__ == "__main__":
-    print(fibonacci(10))
+Builder(".").build()
 ```
 
-Pagecraft also understands **bold**, *italic*, tables, blockquotes, and
-everything else CommonMark supports. Happy writing!
+That small surface area is intentional. The generator should make publishing feel lighter, not add another system to maintain.

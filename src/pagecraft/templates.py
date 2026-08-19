@@ -1,53 +1,63 @@
-"""Layout and template handling for Pagecraft.
-
-Pagecraft ships a set of default Jinja2 layouts (base, page, post, index,
-tags, tag page) and lets projects override any of them by placing a
-``templates/`` directory at the project root. Templates extend one
-another through Jinja2's ``{% extends %}`` inheritance.
-"""
-
+"""Jinja environment and shared template context for Pagecraft."""
 from __future__ import annotations
 
-import os
+from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import ChoiceLoader, Environment, FileSystemLoader, select_autoescape
 
-TEMPLATE_NAMES = ("base.html", "page.html", "post.html", "index.html",
-                  "tags.html", "tag.html", "postcard.html")
+from .config import SiteConfig
+from .content import slugify
 
 
-DEFAULT_TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "templates")
+PACKAGE_ROOT = Path(__file__).resolve().parent
+BUILTIN_TEMPLATES = PACKAGE_ROOT / "resources" / "templates"
+TEMPLATE_NAMES = (
+    "base.html", "page.html", "post.html", "index.html", "tags.html", "tag.html",
+    "categories.html", "category.html", "archive.html", "postcard.html",
+)
 
 
 def make_environment(project_root: str, templates_dir: str | None = None) -> Environment:
-    """Create the Jinja2 environment with the project's overrides taking precedence.
-
-    The built-in Pagecraft templates are always available as a fallback, so
-    projects work even without a local ``templates/`` directory.
-    """
-    search_paths = [os.path.join(project_root, "templates"), DEFAULT_TEMPLATES_DIR]
+    """Create Jinja environment with project templates taking precedence."""
+    loaders = []
     if templates_dir:
-        search_paths.insert(0, templates_dir)
+        loaders.append(FileSystemLoader(templates_dir, encoding="utf-8"))
+    project_templates = Path(project_root) / "templates"
+    if project_templates.is_dir():
+        loaders.append(FileSystemLoader(str(project_templates), encoding="utf-8"))
+    loaders.append(FileSystemLoader(str(BUILTIN_TEMPLATES), encoding="utf-8"))
     env = Environment(
-        loader=FileSystemLoader(search_paths, encoding="utf-8"),
-        autoescape=False,
+        loader=ChoiceLoader(loaders),
+        autoescape=select_autoescape(["html", "xml"]),
         trim_blocks=True,
         lstrip_blocks=True,
         keep_trailing_newline=True,
     )
+    env.filters["date"] = lambda value, fmt="%B %d, %Y": value.strftime(fmt)
+    env.filters["term_slug"] = slugify
     env.globals.update(site=site_context(project_root))
     return env
 
 
 def site_context(project_root: str) -> dict:
-    """Lazy site metadata for templates; filled in by the builder at build time."""
-    from .config import SiteConfig
-
+    """Return stable global template data for a project."""
     config = SiteConfig.load(project_root)
+    navigation = config.navigation or [
+        {"label": "Home", "url": "/"},
+        {"label": "Tags", "url": "/tags.html"},
+        {"label": "Categories", "url": "/categories.html"},
+        {"label": "Archive", "url": "/archive.html"},
+    ]
     return {
         "title": config.title,
         "description": config.description,
         "url": config.url,
         "author": config.author,
-        "feed_url": config.url + "/" + config.feed_filename if config.feed_enabled else "",
+        "language": config.language,
+        "feed_url": config.feed_url if config.feed_enabled else "",
+        "sitemap_url": config.sitemap_url if config.sitemap_enabled and not config.is_placeholder_url else "",
+        "theme_mode": config.theme_mode,
+        "default_image": config.seo_default_image,
+        "twitter_handle": config.seo_twitter_handle,
+        "navigation": navigation,
     }

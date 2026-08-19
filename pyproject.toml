@@ -4,37 +4,53 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pagecraft"
-version = "0.1.0"
-description = "A Markdown-to-HTML static site generator with layouts, tags, RSS feeds, syntax highlighting, asset copying, and incremental builds."
+version = "0.2.0"
+description = "A thoughtful Markdown static site generator with templates, taxonomy pages, feeds, discovery files, and safe incremental builds."
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 requires-python = ">=3.9"
 authors = [
-    { name = "BHARANI KUMAR S", email = "itsmebk2007@gmail.com" },
+  { name = "vincenzo-afk", email = "itsmebk2007@gmail.com" },
 ]
-keywords = ["static-site", "markdown", "blog", "generator", "rss"]
+keywords = ["static-site-generator", "markdown", "blog", "rss", "sitemap", "jinja2", "python"]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Topic :: Internet :: WWW/HTTP :: Site Management",
-    "Topic :: Text Processing :: Markup",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Internet :: WWW/HTTP :: Site Management",
+  "Topic :: Text Processing :: Markup",
 ]
 dependencies = [
-    "markdown>=3.4",
-    "pygments>=2.15",
-    "jinja2>=3.1",
-    "python-frontmatter>=1.0",
-    "pyyaml>=6.0",
-    "watchdog>=3.0",
+  "markdown>=3.4",
+  "pygments>=2.15",
+  "jinja2>=3.1",
+  "python-frontmatter>=1.0",
+  "pyyaml>=6.0",
+  "watchdog>=3.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/vincenzo-afk/Pagecraft"
+Repository = "https://github.com/vincenzo-afk/Pagecraft"
+Issues = "https://github.com/vincenzo-afk/Pagecraft/issues"
+
 [project.optional-dependencies]
-dev = ["pytest>=7.0"]
+dev = ["pytest>=7.0", "build>=1.2"]
 
 [project.scripts]
 pagecraft = "pagecraft.cli:main"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+pagecraft = ["resources/templates/*.html", "resources/static/*.css"]

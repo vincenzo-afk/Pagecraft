@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="listing-page"><p class="eyebrow">Browse</p><h1>Categories</h1><p class="article-dek">A structured view of the site’s main subjects.</p>
+  <div class="term-grid">{% for category in categories %}<a class="term-card" href="{{ category.url }}"><strong>{{ category.name }}</strong><span>{{ category.count }} post{% if category.count != 1 %}s{% endif %}</span></a>{% else %}<p class="empty-state">No categories have been added yet.</p>{% endfor %}</div>
+</section>
+{% endblock %}

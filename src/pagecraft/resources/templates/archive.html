@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="listing-page"><p class="eyebrow">Library</p><h1>Archive</h1><p class="article-dek">Everything published here, arranged by date.</p>
+  <div class="archive-list">{% for group in archives %}<section class="archive-group"><h2>{{ group.posts[0].date.strftime('%B %Y') }}</h2><ul>{% for post in group.posts %}<li><time datetime="{{ post.date.isoformat() }}">{{ post.date.strftime('%d') }}</time><a href="{{ post.url }}">{{ post.title }}</a><span>{{ post.reading_time }} min</span></li>{% endfor %}</ul></section>{% else %}<p class="empty-state">No published posts yet.</p>{% endfor %}</div>
+</section>
+{% endblock %}

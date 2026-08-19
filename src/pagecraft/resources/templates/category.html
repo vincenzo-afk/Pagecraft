@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="listing-page"><p class="eyebrow">Category</p><h1>{{ category.name }}</h1><p class="article-dek">{{ category.count }} published post{% if category.count != 1 %}s{% endif %} in this category.</p>
+  <div class="post-list">{% for post in posts %}{% include "postcard.html" %}{% endfor %}</div>
+</section>
+{% endblock %}
