@@ -1,6 +1,6 @@
 title: Pagecraft Demo
 description: A demo site showing off Pagecraft's features.
-url: https://example.com
+url: https://pagecraft-demo.vercel.app
 author: Vincenzo
 posts_dir: posts
 pages_dir: pages

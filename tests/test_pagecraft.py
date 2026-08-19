@@ -21,7 +21,15 @@ SITE = os.path.join(EXAMPLE, "_site")
 
 @pytest.fixture(autouse=True)
 def clean_output():
-    """Remove build output and cache before and after every test."""
+    """Isolate every test: clear generated files and restore example sources."""
+    source_snapshots = {}
+    for directory in ("posts", "pages"):
+        root = os.path.join(EXAMPLE, directory)
+        for current_root, _, filenames in os.walk(root):
+            for filename in filenames:
+                path = os.path.join(current_root, filename)
+                source_snapshots[path] = open(path, "rb").read()
+
     for path in (SITE, os.path.join(EXAMPLE, ".pagecraft")):
         if os.path.isdir(path):
             shutil.rmtree(path)
@@ -29,6 +37,9 @@ def clean_output():
     for path in (SITE, os.path.join(EXAMPLE, ".pagecraft")):
         if os.path.isdir(path):
             shutil.rmtree(path)
+    for path, content in source_snapshots.items():
+        with open(path, "wb") as fh:
+            fh.write(content)
 
 
 class TestConfig:

@@ -41,11 +41,3 @@ if __name__ == "__main__":
 
 Pagecraft also understands **bold**, *italic*, tables, blockquotes, and
 everything else CommonMark supports. Happy writing!
-
-A new sentence for testing.
-
-A new sentence for testing.
-
-A new sentence for testing.
-
-A new sentence for testing.
