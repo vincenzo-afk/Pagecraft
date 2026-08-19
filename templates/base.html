@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site.title }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
+  {% if site.feed_url %}
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title }} — RSS" href="{{ site.feed_url }}">
+  {% endif %}
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="site-title" href="/">{{ site.title }}</a>
+      <nav class="site-nav">
+        <a href="/">Home</a>
+        <a href="/tags.html">Tags</a>
+        <a href="/about.html">About</a>
+        {% if site.feed_url %}<a class="feed-link" href="{{ site.feed_url }}">RSS</a>{% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; {{ site.author }} &middot; Built with <a href="https://github.com/vincenzo-afk/Pagecraft">Pagecraft</a></p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,13 @@
+title: Pagecraft Demo
+description: A demo site showing off Pagecraft's features.
+url: https://example.com
+author: Vincenzo
+posts_dir: posts
+pages_dir: pages
+assets_dir: assets
+output_dir: _site
+permalinks: true
+feed:
+  enabled: true
+  filename: feed.xml
+  posts_limit: 20

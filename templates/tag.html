@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tag }} &mdash; {{ site.title }}{% endblock %}
+
+{% block content %}
+<h1>Posts tagged &ldquo;{{ tag }}&rdquo;</h1>
+<ul class="post-list">
+  {% for post in posts %}
+    <li class="post-card">
+      <a class="post-card-title" href="{{ post_url or '/' }}{{ post.slug }}.html">{{ post.title }}</a>
+      <p class="post-card-meta"><time datetime="{{ post.date.strftime('%Y-%m-%d') }}">{{ post.date.strftime('%B %d, %Y') }}</time></p>
+      {% if post.description %}<p>{{ post.description }}</p>{% endif %}
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

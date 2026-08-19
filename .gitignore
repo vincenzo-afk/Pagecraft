@@ -1,0 +1,24 @@
+# Pagecraft build output and cache
+_site/
+.pagecraft/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editor and OS
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

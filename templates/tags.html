@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Tags &mdash; {{ site.title }}{% endblock %}
+
+{% block content %}
+<h1>Tags</h1>
+<ul class="tag-cloud">
+  {% for tag in tags %}
+    <li><a class="tag" href="/tag-{{ tag }}.html">{{ tag }}</a></li>
+  {% else %}
+    <li>No tags yet. Add tags to your posts' front matter.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}{{ site.title }}{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1>{{ site.title }}</h1>
+  <p>{{ site.description }}</p>
+</section>
+
+<section class="post-list">
+  <h2>Latest posts</h2>
+  {% for post in posts %}
+    {% include "postcard.html" %}
+  {% else %}
+    <p>No posts yet. Add some Markdown files to <code>{{ config.posts_dir if config is defined else 'posts' }}/</code>.</p>
+  {% endfor %}
+</section>
+{% endblock %}

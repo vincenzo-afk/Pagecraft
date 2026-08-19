@@ -1,0 +1,5 @@
+<li class="post-card">
+  <a class="post-card-title" href="{{ post_url or '/' }}{{ post.slug }}.html">{{ post.title }}</a>
+  <p class="post-card-meta"><time datetime="{{ post.date.strftime('%Y-%m-%d') }}">{{ post.date.strftime('%B %d, %Y') }}</time>{% if post.tags %} &middot; {% for tag in post.tags %}<a class="tag" href="/tag-{{ tag }}.html">{{ tag }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}</p>
+  {% if post.description %}<p>{{ post.description }}</p>{% endif %}
+</li>
