@@ -1,0 +1,65 @@
+name: Bug report
+description: Report a reproducible problem in Pagecraft.
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem. Please do not include security-sensitive details here; see SECURITY.md for private reporting guidance.
+  - type: input
+    id: version
+    attributes:
+      label: Pagecraft version
+      description: Include the output of `python -c "import pagecraft; print(pagecraft.__version__)"` when available.
+      placeholder: "0.2.0"
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: "Python 3.12.0"
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and site configuration
+      description: Share the command you ran and the relevant non-sensitive `site.yaml` settings.
+      placeholder: |
+        pagecraft build --project .
+
+        title: My site
+        url: https://example.com
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the smallest sequence of steps that reproduces the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and output
+      description: Include the complete error message or a small generated HTML example where useful.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues before opening this report.
+          required: true
+        - label: This report does not contain a security vulnerability or secret.
+          required: true
