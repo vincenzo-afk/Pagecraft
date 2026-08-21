@@ -1,82 +1,98 @@
 <p align="center">
-  <img src="https://img.shields.io/github/actions/workflow/status/vincenzo-afk/Pagecraft/test.yml?branch=main&label=tests" alt="Pagecraft continuous-integration status">
+  <img src="https://img.shields.io/github/actions/workflow/status/vincenzo-afk/Pagecraft/test.yml?branch=main&label=checks" alt="Pagecraft continuous integration status">
   <img src="https://img.shields.io/badge/version-0.2.0-1f6feb" alt="Pagecraft version 0.2.0">
-  <img src="https://img.shields.io/badge/python-3.9%2B-3776ab?logo=python&logoColor=white" alt="Python 3.9 or later">
+  <img src="https://img.shields.io/badge/python-3.10%2B-3776ab?logo=python&logoColor=white" alt="Python 3.10 or later">
   <img src="https://img.shields.io/badge/license-MIT-2ea44f" alt="MIT License">
 </p>
 
 # Pagecraft
 
-**A small, deliberate static-site generator for people who would rather write in Markdown than manage a CMS.**
+**A Markdown static-site generator for quiet, maintainable publishing.**
 
-[Demo](https://pagecraft-demo.vercel.app) · [Repository](https://github.com/vincenzo-afk/Pagecraft) · [Report an issue](https://github.com/vincenzo-afk/Pagecraft/issues) · [Request a feature](https://github.com/vincenzo-afk/Pagecraft/issues/new)
+[Live demo](https://pagecraft-demo.vercel.app) · [Repository](https://github.com/vincenzo-afk/Pagecraft) · [Report a bug](https://github.com/vincenzo-afk/Pagecraft/issues/new?template=bug_report.yml) · [Request a feature](https://github.com/vincenzo-afk/Pagecraft/issues/new?template=feature_request.yml)
 
 ---
 
 ## <a name="contents"></a>Contents
 
-- [What Pagecraft is for](#what-pagecraft-is-for)
-- [What it builds](#what-it-builds)
-- [How it fits together](#how-it-fits-together)
-- [Requirements and installation](#requirements-and-installation)
-- [A first site](#a-first-site)
-- [Writing posts and pages](#writing-posts-and-pages)
-- [Configuring a site](#configuring-a-site)
-- [Commands](#commands)
-- [Themes and templates](#themes-and-templates)
-- [Build behavior](#build-behavior)
+- [About Pagecraft](#about-pagecraft)
+- [Technology](#technology)
+- [Getting started](#getting-started)
+- [Using Pagecraft](#using-pagecraft)
+- [Command reference](#command-reference)
 - [Project structure](#project-structure)
-- [Development and testing](#development-and-testing)
-- [Deploying the generated site](#deploying-the-generated-site)
-- [Feature status](#feature-status)
+- [Features and roadmap](#features-and-roadmap)
+- [Testing and continuous integration](#testing-and-continuous-integration)
+- [Deployment](#deployment)
 - [Contributing](#contributing)
 - [Security](#security)
-- [License and acknowledgements](#license-and-acknowledgements)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ---
 
-## <a name="what-pagecraft-is-for"></a>What Pagecraft is for
+## <a name="about-pagecraft"></a>About Pagecraft
 
-Pagecraft turns a directory of Markdown files into a static website. It is aimed at personal journals, documentation sites, small blogs, and other projects where the source should remain readable long after the tool that built it has changed. Posts, pages, assets, and optional template overrides all live in the project directory; the result is an ordinary `_site/` folder containing HTML, CSS, feeds, and discovery files.
+Pagecraft turns a directory of Markdown files into a complete static website. It is intended for small blogs, personal journals, documentation sites, and other writing-first projects where the source should remain readable without a database or hosted content-management system. A site is made of ordinary files: Markdown for posts and pages, `site.yaml` for settings, optional Jinja templates, and assets copied directly into the generated output.
 
-The project deliberately has a narrow surface area. There is no database, account system, hosted editor, or required service. The generated files can be reviewed locally and hosted wherever plain static files are accepted.
+The builder renders article pages alongside the pages a publication needs around them: paginated indexes, tags, categories, archives, an RSS 2.0 feed, a sitemap, and `robots.txt`. It tracks generated files and copied assets in a local manifest, so routine builds write only content that changed and remove stale output when source files disappear.
 
-## <a name="what-it-builds"></a>What it builds
-
-| Area | Included in v0.2 |
+| Area | Included behavior |
 | --- | --- |
-| Writing | Markdown rendering, YAML front matter, heading anchors, tables, and Pygments-highlighted fenced code blocks |
-| Publishing | Draft and future-post controls, dated posts, standalone pages, custom slugs, and safe permalinks |
-| Organization | Tags, categories, chronological archives, and configurable homepage pagination |
-| Discovery | RSS 2.0 feed, `sitemap.xml`, `robots.txt`, canonical URLs, Open Graph metadata, and article dates |
-| Presentation | Jinja2 layouts, project-level template overrides, responsive typography, and a persisted light/dark theme choice |
-| Workflow | Incremental output, stale-file cleanup, asset synchronization, validation, JSON reports, watch mode, local serving, and post scaffolding |
+| Writing | Markdown, YAML front matter, tables, heading anchors, and Pygments-highlighted fenced code blocks |
+| Publishing | Draft and future-post previews, custom slugs, safe permalinks, summaries, dates, and reading-time metadata |
+| Organization | Tags, categories, archives, and configurable homepage pagination |
+| Discovery | RSS, sitemap, `robots.txt`, canonical URLs, Open Graph metadata, and article metadata |
+| Presentation | Bundled Jinja layouts, project-level template overrides, responsive CSS, and light/dark theme support |
+| Workflow | Incremental builds, stale-file cleanup, asset synchronization, validation, JSON reports, watch mode, a local server, and post scaffolding |
 
-The included [demo journal](https://pagecraft-demo.vercel.app) exercises the built-in theme, category pages, tags, archive, pagination, feed, sitemap, and syntax highlighting.
+The [public demo](https://pagecraft-demo.vercel.app) uses the built-in theme and exercises article pages, taxonomy pages, pagination, feed output, discovery files, and syntax highlighting.
 
-## <a name="how-it-fits-together"></a>How it fits together
+### How a build fits together
 
 ```mermaid
 flowchart LR
     A[Markdown posts and pages] --> B[Front matter and content model]
     C[site.yaml] --> B
-    D[Templates and static assets] --> E[Builder]
+    D[Templates and assets] --> E[Pagecraft builder]
     B --> E
-    E --> F[HTML pages]
-    E --> G[Collections: tags, categories, archive, pagination]
-    E --> H[RSS, sitemap, robots.txt]
+    E --> F[Article and page HTML]
+    E --> G[Tags, categories, archive, and pagination]
+    E --> H[RSS, sitemap, and robots.txt]
     F --> I[_site/]
     G --> I
     H --> I
 ```
 
-The builder first normalizes front matter and public routes, then renders the complete set of derived pages in memory. A versioned manifest records hashes for generated output and copied assets. Unchanged files are left alone, while files no longer represented by the source are removed on the next build. This keeps a quick rebuild from leaving an old tag page or deleted asset behind.
+> Pagecraft calculates the complete public site before deciding what to write. That makes derived pages correct after a post, tag, category, or asset changes, while the manifest avoids rewriting identical output.
 
-## <a name="requirements-and-installation"></a>Requirements and installation
+---
 
-Pagecraft supports **Python 3.9 or later**. It has no environment variables, API keys, database, or account requirements.
+## <a name="technology"></a>Technology
 
-For local development, clone the repository and install the project in editable mode:
+Pagecraft is a Python package and command-line application. It does not run a database, HTTP API, server-side application, or external service during a normal build.
+
+| Layer | Technology | Verified role |
+| --- | --- | --- |
+| Runtime | Python 3.10–3.12 | Package support policy and CI matrix |
+| Markdown | [Python-Markdown](https://python-markdown.github.io/) `>=3.4` | Markdown rendering and extensions |
+| Templates | [Jinja](https://jinja.palletsprojects.com/) `>=3.1` | Built-in and project-overridden HTML layouts |
+| Highlighting | [Pygments](https://pygments.org/) `>=2.15` | Fenced-code highlighting and generated styles |
+| Metadata | [python-frontmatter](https://github.com/eyeseast/python-frontmatter) `>=1.0` and [PyYAML](https://pyyaml.org/) `>=6.0` | Front matter and `site.yaml` parsing |
+| File watching | [watchdog](https://python-watchdog.readthedocs.io/) `>=3.0` | Rebuilds in `watch` and `serve --watch` modes |
+| Tests | [pytest](https://docs.pytest.org/) `>=7.0` | Regression suite |
+| Packaging | [setuptools](https://setuptools.pypa.io/) and [build](https://pypa-build.readthedocs.io/) | Source distribution and wheel builds |
+| Demo hosting | [Vercel](https://vercel.com/) | Static hosting for the public example site |
+
+---
+
+## <a name="getting-started"></a>Getting started
+
+### Prerequisites
+
+Install Python **3.10 or later**. No database, account, API key, or required environment variable is needed to use Pagecraft.
+
+For development, clone the repository and install the development extra:
 
 ```bash
 git clone https://github.com/vincenzo-afk/Pagecraft.git
@@ -84,11 +100,13 @@ cd Pagecraft
 python3 -m pip install -e ".[dev]"
 ```
 
-The development extra installs the test and packaging tools. To use the generator from the checkout without development extras, install `.` instead.
+To use Pagecraft without the development tools, install the package from the checkout instead:
 
-## <a name="a-first-site"></a>A first site
+```bash
+python3 -m pip install .
+```
 
-Create a starter project, add a post, and run a local preview:
+### Create a first site
 
 ```bash
 pagecraft init my-journal
@@ -98,50 +116,17 @@ pagecraft build
 pagecraft serve
 ```
 
-`pagecraft serve` builds the site first and serves `_site/` on `http://127.0.0.1:8000`. Stop the server with `Ctrl+C`. The starter project has a `site.yaml`, a sample post, and an About page; the generated output is always safe to delete and rebuild.
+The local server listens on `http://127.0.0.1:8000` by default. Stop it with `Ctrl+C`. The generated `_site/` directory can be deleted and recreated at any time.
 
-For the repository demo, run the following from the project root:
+### Configuration and environment
 
-```bash
-pagecraft build --project example --full
-pagecraft serve --project example
-```
+A Pagecraft site uses `site.yaml`; it does not use a `.env` file. The only optional environment variable read by the CLI is `EDITOR`, which `pagecraft new-post --editor` uses to open a newly created post.
 
-## <a name="writing-posts-and-pages"></a>Writing posts and pages
+| Variable | Required | Used by |
+| --- | --- | --- |
+| `EDITOR` | No | `pagecraft new-post --editor`; the command still creates the post when it is unset |
 
-Posts belong in `posts/`; standalone pages belong in `pages/`. Every file can use YAML front matter, but Pagecraft will derive a title and slug from the filename when those fields are absent.
-
-```markdown
----
-title: A useful entry
-date: 2026-08-20
-updated: 2026-08-21
-categories: [Writing]
-tags: [notes, pagecraft]
-description: A short description used in listings and metadata.
-summary: A smaller excerpt for the homepage.
-image: /images/entry-card.png
-slug: useful-entry
-# permalink: /writing/useful-entry/
-# draft: true
----
-
-# A useful entry
-
-Pagecraft renders **Markdown** and highlights fenced code blocks.
-
-```python
-from pagecraft.builder import Builder
-
-Builder(".").build()
-```
-```
-
-A post marked `draft: true` is excluded from a normal build. Use `pagecraft build --drafts` to preview it. A future-dated post is also excluded until its date arrives; use `--future` when previewing scheduled content. Standalone pages are published by default even when they do not carry a date.
-
-## <a name="configuring-a-site"></a>Configuring a site
-
-`site.yaml` is the entire project configuration surface. The following is a complete, compact example based on the included demo:
+A compact, complete `site.yaml` looks like this:
 
 ```yaml
 title: My Journal
@@ -188,50 +173,81 @@ navigation:
     url: /archive.html
 ```
 
-`theme.mode` accepts `auto`, `light`, or `dark`. When `url` is left at the default placeholder, Pagecraft avoids publishing a sitemap and robots file with a false canonical domain. Set the production URL before deployment so feeds, canonicals, and discovery files point to the right place.
+Set `url` to the final public HTTPS address before deployment. When the placeholder `example.com` address is left in place, Pagecraft suppresses sitemap and robots output rather than publishing discovery files with an incorrect canonical domain.
 
-## <a name="commands"></a>Commands
+---
+
+## <a name="using-pagecraft"></a>Using Pagecraft
+
+Posts belong in `posts/`; standalone pages belong in `pages/`. Front matter is optional, but it is the place to set publishing state, taxonomy, summaries, and metadata. Pagecraft derives missing titles and slugs from filenames.
+
+```markdown
+---
+title: A useful entry
+date: 2026-08-20
+updated: 2026-08-21
+categories: [Writing]
+tags: [notes, pagecraft]
+description: A short description used in listings and metadata.
+summary: A smaller excerpt for the homepage.
+image: /images/entry-card.png
+slug: useful-entry
+# permalink: /writing/useful-entry/
+# draft: true
+---
+
+# A useful entry
+
+Pagecraft renders **Markdown** and highlights fenced code blocks.
+
+```python
+from pagecraft.builder import Builder
+
+Builder(".").build()
+```
+```
+
+A post marked `draft: true` is excluded from a normal build. Use `--drafts` to preview it. A future-dated post is similarly excluded until its publication date; use `--future` during a preview build. Undated standalone pages are published by default.
+
+### Templates and assets
+
+Pagecraft bundles the standard layouts and stylesheet with the installed package. A project can override a built-in layout by placing a same-named file in `templates/`; common choices are `base.html`, `index.html`, `post.html`, and `page.html`. Collection layouts cover tags, categories, and archives.
+
+The default stylesheet is generated as `_site/style.css`. Place project-owned JavaScript, images, fonts, or additional CSS under `assets/`; Pagecraft synchronizes those files into `_site/` and removes stale copies in later builds.
+
+---
+
+## <a name="command-reference"></a>Command reference
+
+Pagecraft is a CLI-only project and does not expose an HTTP API.
 
 | Command | Purpose |
 | --- | --- |
-| `pagecraft init [path]` | Create a starter project in `path`, or the current directory when omitted. |
-| `pagecraft build` | Build incrementally using the existing manifest. |
-| `pagecraft build --full` | Ignore the manifest and rewrite all generated files. |
+| `pagecraft init [path]` | Create a starter site in `path`, or the current directory when omitted, without overwriting existing files. |
+| `pagecraft build` | Build incrementally from the existing manifest. |
+| `pagecraft build --full` | Ignore the manifest and rewrite generated output. |
 | `pagecraft build --drafts --future` | Include draft and future posts for a preview build. |
-| `pagecraft build --json` | Print a machine-readable build report. |
+| `pagecraft build --json` | Emit a machine-readable build report. |
 | `pagecraft build --verbose` | List generated, skipped, copied, and removed files. |
 | `pagecraft check` | Validate configuration, routes, and local links without writing output. |
-| `pagecraft clean` | Remove `_site/` and `.pagecraft/`. |
-| `pagecraft new-post "Title" --draft --category Writing --tag notes` | Create a dated Markdown post with selected metadata. |
-| `pagecraft new-post "Title" --editor` | Create a post and open it with `$EDITOR`. |
+| `pagecraft check --json` | Emit validation results as JSON. |
+| `pagecraft clean` | Remove the configured output directory and `.pagecraft/` manifest cache. |
+| `pagecraft new-post "Title" --draft --category Writing --tag notes` | Create a dated post with selected metadata. |
+| `pagecraft new-post "Title" --editor` | Create a post and open it with `$EDITOR` when available. |
 | `pagecraft watch` | Build once, then rebuild after source changes. |
-| `pagecraft serve --port 8080 --watch` | Serve the generated site and rebuild while editing. |
+| `pagecraft serve --port 8080 --watch` | Build, serve the output locally, and rebuild while editing. |
 
-## <a name="themes-and-templates"></a>Themes and templates
+All build-related commands accept `--project PATH`. `watch` and `serve --watch` also accept `--debounce SECONDS`, which defaults to `0.35` seconds.
 
-The built-in layouts are bundled with Pagecraft, so an installed wheel does not depend on files from the source checkout. A project can override any built-in template by adding a file with the same name under `templates/`. Common overrides are `base.html`, `index.html`, `post.html`, and `page.html`; collection templates cover tags, categories, and the archive.
-
-The standard stylesheet is emitted as `_site/style.css`. Put project-owned images, JavaScript, fonts, or extra CSS in `assets/`; Pagecraft copies them into `_site/` while tracking additions, changes, and deletions. The theme toggle stores a reader’s preference in the browser, while `theme.mode` controls the initial preference.
-
-## <a name="build-behavior"></a>Build behavior
-
-A Pagecraft build calculates the full public site so that derived pages remain correct, then only writes output whose rendered content has changed. The manifest lives at `.pagecraft/manifest.json` and is an implementation detail; do not edit it manually.
-
-| Source change | Result |
-| --- | --- |
-| Edit a post | Its article, affected indexes, taxonomy pages, feed, archive, sitemap, and any changed derived pages are refreshed. |
-| Rename or delete a post | The old generated HTML is removed and collections are rebuilt without it. |
-| Add, change, or remove an asset | The matching output asset is synchronized, including stale-file removal. |
-| Change a template or configuration | Generated output is updated where the rendered content changes. |
-| Run `pagecraft check` | Content is prepared and validated without creating `_site/`. |
-
-Route conflicts and unsafe permalinks stop the build with a readable error rather than silently overwriting a page.
+---
 
 ## <a name="project-structure"></a>Project structure
 
+A generated site is intentionally simple:
+
 ```text
 my-journal/
-├── site.yaml                 # Site identity, navigation, feeds, and build options
+├── site.yaml                 # Site identity, navigation, discovery, and build options
 ├── posts/                    # Markdown blog entries
 ├── pages/                    # Markdown standalone pages
 ├── assets/                   # Files copied into the output directory
@@ -240,35 +256,57 @@ my-journal/
 └── .pagecraft/               # Incremental-build manifest; do not edit by hand
 ```
 
-The Pagecraft repository is organized around the same separation of concerns:
-
 <details>
 <summary>Repository layout</summary>
 
 ```text
 Pagecraft/
+├── .github/
+│   ├── ISSUE_TEMPLATE/        # Bug and feature forms
+│   ├── workflows/test.yml     # Test matrix and package build
+│   └── pull_request_template.md
+├── example/                   # Source for the public demo journal
 ├── src/pagecraft/
-│   ├── builder.py             # Collection rendering, incremental output, and stale-file cleanup
-│   ├── cli.py                 # Command-line interface and local server
+│   ├── assets.py              # Asset synchronization and stale-file cleanup
+│   ├── builder.py             # Collections, output manifest, and generation pipeline
+│   ├── cli.py                 # CLI, watcher, and local server
 │   ├── config.py              # site.yaml parsing and validation
-│   ├── content.py             # Front-matter normalization, slugs, routes, and publication state
-│   ├── discovery.py           # Sitemap and robots generation
+│   ├── content.py             # Front matter, routes, and publication state
+│   ├── discovery.py           # Sitemap and robots output
 │   ├── renderer.py            # Markdown and Pygments rendering
-│   ├── rss.py                 # RSS 2.0 output
-│   └── resources/             # Bundled theme and Jinja2 templates
+│   ├── rss.py                 # RSS 2.0 generation
+│   ├── templates.py           # Jinja environment and shared context
+│   └── resources/             # Bundled layouts and stylesheet
+├── static/                    # Source copy of the bundled stylesheet
 ├── templates/                 # Source copies of the bundled layouts
-├── static/                    # Source copy of the bundled theme
-├── example/                   # Public demo journal
 ├── tests/                     # Pytest regression suite
-├── .github/workflows/test.yml # CI and distribution build
 ├── CHANGELOG.md               # Release history
+├── CONTRIBUTING.md            # Development and pull-request guidance
+├── CODE_OF_CONDUCT.md         # Community standards
+├── SECURITY.md                # Private vulnerability-reporting policy
 └── pyproject.toml             # Package metadata and dependencies
 ```
 </details>
 
-## <a name="development-and-testing"></a>Development and testing
+---
 
-The regression suite uses `pytest` and covers configuration validation, Markdown rendering, publication state, collections, feeds, sitemap and robots output, route collisions, incremental output, stale assets, manifests, and the command-line workflow.
+## <a name="features-and-roadmap"></a>Features and roadmap
+
+| Status | Work |
+| --- | --- |
+| ✅ | Markdown, YAML front matter, syntax highlighting, templates, and assets |
+| ✅ | Tags, categories, archive pages, pagination, drafts, future-post previews, RSS, sitemap, and robots output |
+| ✅ | Canonical URLs, SEO metadata, route validation, stale-output cleanup, local preview, watch mode, and JSON reports |
+| ✅ | Responsive light/dark theme, example journal, CI, source distributions, and wheel builds |
+| Deliberately absent in 0.2 | Search, image processing, and a plugin API |
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+---
+
+## <a name="testing-and-continuous-integration"></a>Testing and continuous integration
+
+The pytest suite covers configuration validation, Markdown rendering, publishing state, taxonomy pages, feed and discovery output, route collisions, incremental builds, stale assets, bundled resources, and command-line behavior.
 
 ```bash
 python3 -m pip install -e ".[dev]"
@@ -276,50 +314,48 @@ python3 -m pytest
 python3 -m build
 ```
 
-Continuous integration runs the test suite on Python 3.9, 3.10, 3.11, and 3.12. A separate job builds the source distribution and wheel. The workflow is stored in [`.github/workflows/test.yml`](.github/workflows/test.yml).
+GitHub Actions runs tests on Python 3.10, 3.11, and 3.12. A separate workflow job builds both the source distribution and wheel. The workflow is defined in [`.github/workflows/test.yml`](.github/workflows/test.yml).
 
-## <a name="deploying-the-generated-site"></a>Deploying the generated site
+---
 
-Deployment begins with a normal build:
+## <a name="deployment"></a>Deployment
+
+Build the site before publishing it to a static host:
 
 ```bash
 pagecraft build --full
 ```
 
-Upload the resulting `_site/` directory to any static host. For a hosted project that builds from source, install Pagecraft in the build environment, run `pagecraft build`, and configure `_site/` as the published directory. The output has no server runtime requirement.
+Publish the resulting `_site/` directory to any host that serves static files. A hosted project that builds from source needs only Python, the Pagecraft package, a `pagecraft build` step, and `_site/` as the published directory; the final output has no server runtime requirement.
 
-The repository’s example is deployed at [pagecraft-demo.vercel.app](https://pagecraft-demo.vercel.app). Its `url` setting is intentionally the same public address, which keeps canonical metadata, RSS links, the sitemap, and `robots.txt` consistent with the hosted site.
-
-## <a name="feature-status"></a>Feature status
-
-| Status | Work |
-| --- | --- |
-| ✅ | Markdown, YAML front matter, syntax highlighting, layouts, and asset synchronization |
-| ✅ | Tags, categories, archive, pagination, drafts, future-post previews, RSS, sitemap, and robots output |
-| ✅ | SEO metadata, canonical URLs, route validation, stale-output cleanup, local preview, watch mode, and JSON reports |
-| ✅ | Responsive light/dark theme, a complete example journal, CI, source distributions, and wheel builds |
-| Next | Search, image processing, and plugin APIs are intentionally not part of v0.2. |
-
-Release notes are maintained in [CHANGELOG.md](CHANGELOG.md).
-
-## <a name="contributing"></a>Contributing
-
-Small, focused pull requests are easiest to review. Create a branch named for the change, such as `feat/category-filter` or `fix/rss-date`, add regression coverage for behavior that changed, and run the full test suite before opening a pull request.
-
-Use clear, imperative commit messages. Conventional Commit prefixes such as `feat:` and `fix:` are welcome but not mandatory. Keep user-visible behavior documented when a command, configuration field, or generated file changes.
-
-## <a name="security"></a>Security
-
-Pagecraft is a local build tool. It does not require credentials or send project content to a remote service. It validates public routes and permalinks before writing output, rejects collisions instead of overwriting generated pages, and keeps generated paths inside the selected output directory.
-
-Please do not publish suspected security issues in a public issue. Use GitHub’s private vulnerability-reporting flow for this repository when available, or contact the repository owner directly through [GitHub](https://github.com/vincenzo-afk).
-
-## <a name="license-and-acknowledgements"></a>License and acknowledgements
-
-Pagecraft is available under the [MIT License](LICENSE). Copyright © 2026 [vincenzo-afk](https://github.com/vincenzo-afk).
-
-The project is built with [Python-Markdown](https://python-markdown.github.io/), [Jinja](https://jinja.palletsprojects.com/), [Pygments](https://pygments.org/), [python-frontmatter](https://github.com/eyeseast/python-frontmatter), [PyYAML](https://pyyaml.org/), and [watchdog](https://python-watchdog.readthedocs.io/). Their focused, dependable libraries make a modest publishing tool possible.
+The repository example is deployed at [pagecraft-demo.vercel.app](https://pagecraft-demo.vercel.app). Its `url` setting matches that public address so canonical metadata, RSS links, the sitemap, and `robots.txt` resolve to the deployed site.
 
 ---
 
-[Back to top](#pagecraft) · Built and maintained by [vincenzo-afk](https://github.com/vincenzo-afk)
+## <a name="contributing"></a>Contributing
+
+Pagecraft welcomes small, well-tested improvements. Read [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, branch naming, verification, documentation expectations, and pull-request guidance. Community participation is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+---
+
+## <a name="security"></a>Security
+
+Pagecraft is a local build tool. It validates public routes and permalinks before writing, rejects route collisions, and keeps generated paths inside the selected output directory. The project does not require credentials or transmit source content during a normal build.
+
+Do not report a suspected vulnerability in a public issue. Read [SECURITY.md](SECURITY.md) for the supported version policy and private reporting address.
+
+---
+
+## <a name="license"></a>License
+
+Pagecraft is released under the [MIT License](LICENSE). Copyright © 2026 BHARANI KUMAR S.
+
+---
+
+## <a name="acknowledgements"></a>Acknowledgements
+
+Pagecraft is built on Python-Markdown, Jinja, Pygments, python-frontmatter, PyYAML, and watchdog. These focused libraries keep the generator small while supporting a practical writing workflow.
+
+---
+
+[Back to top](#pagecraft) · [GitHub](https://github.com/vincenzo-afk) · [Live demo](https://pagecraft-demo.vercel.app)
