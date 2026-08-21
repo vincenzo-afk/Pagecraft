@@ -39,7 +39,7 @@ Repository = "https://github.com/vincenzo-afk/Pagecraft"
 Issues = "https://github.com/vincenzo-afk/Pagecraft/issues"
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0", "build>=1.2"]
+dev = ["pytest>=9.1.1", "build>=1.2"]
 
 [project.scripts]
 pagecraft = "pagecraft.cli:main"
